@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#122238">
+<title>تسجيل مراكز الصيانة</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #f6f1e4;
+  --surface: #ffffff;
+  --surface-2: #faf7ee;
+  --fg: #1c1207;
+  --muted: #6b5b3a;
+  --border: rgba(28,18,7,0.12);
+  --navy: #122238;
+  --navy-2: #1c3a5c;
+  --gold: #a8791f;
+  --gold-soft: rgba(168,121,31,0.14);
+  --whatsapp: #22a559;
+  --danger: #b3261e;
+  --danger-soft: rgba(179,38,30,0.1);
+  --success-soft: rgba(34,165,89,0.12);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15120b; --surface: #211b10; --surface-2: #272013; --fg: #f3ecd9;
+    --muted: #c9b98f; --border: rgba(243,236,217,0.14); --navy: #0c1726;
+    --navy-2: #16314e; --gold: #e0b45a; --gold-soft: rgba(224,180,90,0.16);
+    --whatsapp: #35c276; --danger: #ff8178; --danger-soft: rgba(255,129,120,0.14);
+    --success-soft: rgba(53,194,118,0.14);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15120b; --surface: #211b10; --surface-2: #272013; --fg: #f3ecd9;
+  --muted: #c9b98f; --border: rgba(243,236,217,0.14); --navy: #0c1726;
+  --navy-2: #16314e; --gold: #e0b45a; --gold-soft: rgba(224,180,90,0.16);
+  --whatsapp: #35c276; --danger: #ff8178; --danger-soft: rgba(255,129,120,0.14);
+  --success-soft: rgba(53,194,118,0.14);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+  padding-inline: 16px; padding-block: 20px 40px;
+  max-width: 560px; margin: 0 auto;
+}
+h1, h2, .display { font-family: 'Cairo', 'Tajawal', sans-serif; }
+.eyebrow { font-size: 12.5px; font-weight: 700; color: var(--gold); letter-spacing: .04em; margin: 0 0 4px; }
+h1 { font-size: 22px; font-weight: 900; margin: 0 0 4px; text-wrap: balance; }
+.sub { font-size: 14px; color: var(--muted); margin: 0 0 20px; line-height: 1.6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 16px; }
+.card h2 { font-size: 15px; font-weight: 800; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+.step-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--navy); color: #f3ecd9; font-size: 12px; font-weight: 800; flex: none; }
+label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 6px; }
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+input[type="text"], select {
+  width: 100%; font-family: inherit; font-size: 15px; color: var(--fg);
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 11px 12px; min-width: 0;
+}
+input[type="text"]:focus, select:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 18px) center, calc(100% - 13px) center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 800; border: none; border-radius: 12px; padding: 15px 16px; cursor: pointer; transition: transform .08s ease, opacity .15s ease; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--navy); color: #f3ecd9; }
+.btn-whatsapp { background: var(--whatsapp); color: #ffffff; }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.status { display: none; border-radius: 10px; padding: 10px 12px; font-size: 13.5px; margin-top: 12px; line-height: 1.6; }
+.status.show { display: block; }
+.status-error { background: var(--danger-soft); color: var(--danger); }
+.status-ok { background: var(--success-soft); color: var(--whatsapp); }
+.gps-box { display: none; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-top: 12px; font-size: 13px; }
+.gps-box.show { display: flex; }
+.gps-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--whatsapp); flex: none; }
+.gps-box .coords { font-variant-numeric: tabular-nums; color: var(--muted); }
+.history-item { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+.history-item:first-child { border-top: none; }
+.history-item .who { font-weight: 700; }
+.history-time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.history-empty { color: var(--muted); font-size: 13.5px; padding: 6px 0; }
+.note { font-size: 12.5px; color: var(--muted); line-height: 1.7; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); }
+.install-banner { display: none; align-items: center; gap: 10px; background: var(--gold-soft); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 13.5px; }
+.install-banner.show { display: flex; }
+.install-banner button { margin-inline-start: auto; background: var(--navy); color: #f3ecd9; border: none; border-radius: 8px; padding: 8px 14px; font-weight: 800; font-family: 'Cairo', sans-serif; font-size: 13px; cursor: pointer; flex: none; }
+</style>
+</head>
+<body>
+
+<div class="install-banner" id="installBanner">
+  <span>📲 ثبّت هذا التطبيق على شاشتك الرئيسية لفتحه بضغطة وحدة.</span>
+  <button id="installBtn" type="button">تثبيت</button>
+</div>
+
+<p class="eyebrow">شركة الميدان · مراكز الصيانة</p>
+<h1>تسجيل زيارة / حضور مركز الصيانة</h1>
+<p class="sub">اختر المركز ونوع التسجيل واضغط الزر — التطبيق ياخذ موقعك الحالي تلقائيًا ويرسل كل شي لمسؤول المتابعة عبر واتساب بضغطة وحدة.</p>
+
+<div class="card">
+  <h2><span class="step-num">1</span> بيانات التسجيل</h2>
+  <div class="field">
+    <label for="promoterName">اسمك</label>
+    <input type="text" id="promoterName" placeholder="مثال: محمد علي" autocomplete="off">
+  </div>
+  <div class="field">
+    <label for="shopName">مركز الصيانة</label>
+    <select id="shopName"><option value="">اختر المركز</option></select>
+  </div>
+  <div class="field">
+    <label for="kind">نوع التسجيل</label>
+    <select id="kind">
+      <option value="">اختر النوع</option>
+      <option>وصول (حضور)</option>
+      <option>مغادرة (انصراف)</option>
+      <option>زيارة تفتيش / متابعة</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="step-num">2</span> تسجيل الموقع والإرسال</h2>
+  <button class="btn btn-primary" id="locateBtn" type="button">
+    <span id="locateIcon" aria-hidden="true">📍</span><span id="locateLabel">تحديد موقعي الحالي</span>
+  </button>
+  <div class="gps-box" id="gpsBox">
+    <span class="gps-dot"></span>
+    <span>تم تحديد الموقع — <span class="coords" id="gpsCoords"></span></span>
+  </div>
+  <button class="btn btn-whatsapp" id="sendBtn" type="button" style="margin-top:12px;" disabled>
+    <span aria-hidden="true">💬</span><span>إرسال التسجيل عبر واتساب</span>
+  </button>
+  <div class="status" id="statusBox"></div>
+</div>
+
+<div class="card">
+  <h2>آخر التسجيلات من هذا الجهاز</h2>
+  <div id="historyList"><p class="history-empty">ما عندك تسجيلات من هذا الجهاز بعد.</p></div>
+  <p class="note">هذا السجل محفوظ بجهازك فقط للمتابعة الشخصية — السجل الرسمي هو محادثة الواتساب نفسها عند مسؤول المتابعة.</p>
+</div>
+
+<p class="note" style="margin-top:4px;">
+  نصيحة: اسوّوا كروب واتساب مخصص لمراكز الصيانة وكل الموظفين يرسلون فيه بدل الرسائل الخاصة — هيك كل التسجيلات والمواقع تنجمع بمكان وحد، وتكدرون تراجعونها وقت ما تريدون.
+</p>
+
+<script>
+(function () {
+  var MANAGER_PHONE = "9647735350223";
+  // مراكز الصيانة الخمسة — عدّلها هنا فقط
+  var CENTERS = ["مركز أربيل", "مركز بغداد", "مركز الموصل", "مركز النجف", "مركز البصرة"];
+  var nameEl = document.getElementById('promoterName');
+  var shopEl = document.getElementById('shopName');
+  var kindEl = document.getElementById('kind');
+  CENTERS.forEach(function (c) { var o = document.createElement('option'); o.textContent = c; shopEl.appendChild(o); });
+  var locateBtn = document.getElementById('locateBtn');
+  var locateIcon = document.getElementById('locateIcon');
+  var locateLabel = document.getElementById('locateLabel');
+  var sendBtn = document.getElementById('sendBtn');
+  var statusBox = document.getElementById('statusBox');
+  var gpsBox = document.getElementById('gpsBox');
+  var gpsCoords = document.getElementById('gpsCoords');
+  var historyList = document.getElementById('historyList');
+
+  var lastPosition = null;
+
+  function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+  function safeGetJSON(key) { try { var r = localStorage.getItem(key); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
+  function safeSetJSON(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+  var savedName = safeGet('midan_promoter_name'); if (savedName) nameEl.value = savedName;
+  var savedShop = safeGet('midan_svc_center'); if (savedShop) shopEl.value = savedShop;
+
+  function fmtTime(d) {
+    var days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? 'م' : 'ص';
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    var mm = m < 10 ? '0' + m : '' + m;
+    return days[d.getDay()] + ' ' + h12 + ':' + mm + ' ' + ampm;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; });
+  }
+
+  function renderHistory() {
+    var items = safeGetJSON('midan_visit_log');
+    if (!items.length) { historyList.innerHTML = '<p class="history-empty">ما عندك تسجيلات من هذا الجهاز بعد.</p>'; return; }
+    historyList.innerHTML = items.slice(0, 8).map(function (it) {
+      return '<div class="history-item"><span><span class="who">' + escapeHtml(it.shop) + '</span> <span style="color:var(--muted)">— ' + escapeHtml(it.kind || '') + '</span></span><span class="history-time">' + escapeHtml(it.when) + '</span></div>';
+    }).join('');
+  }
+
+  function showStatus(msg, kind) {
+    statusBox.textContent = msg;
+    statusBox.className = 'status show ' + (kind === 'error' ? 'status-error' : 'status-ok');
+  }
+  function clearStatus() { statusBox.className = 'status'; statusBox.textContent = ''; }
+
+  function setLocating(on) {
+    locateBtn.disabled = on;
+    locateIcon.innerHTML = on ? '<span class="spinner"></span>' : '📍';
+    locateLabel.textContent = on ? 'جاري تحديد الموقع…' : 'تحديد موقعي الحالي';
+  }
+
+  locateBtn.addEventListener('click', function () {
+    clearStatus();
+    if (!('geolocation' in navigator)) {
+      showStatus('جهازك أو المتصفح ما يدعم تحديد الموقع. جرب من متصفح ثاني (كروم مثلاً).', 'error');
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        setLocating(false);
+        lastPosition = pos.coords;
+        gpsCoords.textContent = pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5) + ' (دقة ~' + Math.round(pos.coords.accuracy) + 'م)';
+        gpsBox.classList.add('show');
+        sendBtn.disabled = false;
+      },
+      function (err) {
+        setLocating(false);
+        var msg = 'تعذر تحديد الموقع. حاول مرة ثانية.';
+        if (err.code === 1) msg = 'رفضت صلاحية الموقع. افتح إعدادات المتصفح وفعّل صلاحية الموقع لهذا الموقع، وجرب مرة ثانية.';
+        else if (err.code === 2) msg = 'ما كدرنا نحدد موقعك الحالي. تأكد إن خدمة الموقع (GPS) مفعّلة بجهازك.';
+        else if (err.code === 3) msg = 'استغرق تحديد الموقع وقت أطول من اللازم. جرب مرة ثانية بمكان مفتوح.';
+        showStatus(msg, 'error');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  });
+
+  sendBtn.addEventListener('click', function () {
+    clearStatus();
+    var name = nameEl.value.trim();
+    var shop = shopEl.value;
+    var kind = kindEl.value;
+
+    if (!name || !shop || !kind) { showStatus('عبّي الاسم والمركز ونوع التسجيل قبل ما ترسل.', 'error'); return; }
+    if (!lastPosition) { showStatus('حدد موقعك الحالي أول (الزر اللي فوق) قبل الإرسال.', 'error'); return; }
+
+    safeSet('midan_promoter_name', name);
+    safeSet('midan_svc_center', shop);
+
+    var now = new Date();
+    var timeStr = fmtTime(now);
+    var mapsLink = 'https://maps.google.com/?q=' + lastPosition.latitude + ',' + lastPosition.longitude;
+
+    var text = '✅ تسجيل مركز صيانة\n' +
+      'النوع: ' + kind + '\n' +
+      'الموظف: ' + name + '\n' +
+      'المركز: ' + shop + '\n' +
+      'الوقت: ' + timeStr + '\n' +
+      '📍 الموقع: ' + mapsLink;
+
+    var url = 'https://wa.me/' + MANAGER_PHONE + '?text=' + encodeURIComponent(text);
+
+    var log = safeGetJSON('midan_visit_log');
+    log.unshift({ shop: shop, kind: kind, when: timeStr });
+    safeSetJSON('midan_visit_log', log.slice(0, 20));
+    renderHistory();
+
+    showStatus('جاهز — فتحنا واتساب لك. اضغط إرسال هناك لإتمام التسجيل.', 'ok');
+    window.location.href = url;
+  });
+
+  renderHistory();
+
+  // PWA install prompt
+  var deferredPrompt = null;
+  var installBanner = document.getElementById('installBanner');
+  var installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBanner.classList.add('show');
+  });
+  installBtn.addEventListener('click', function () {
+    installBanner.classList.remove('show');
+    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+  });
+  window.addEventListener('appinstalled', function () { installBanner.classList.remove('show'); });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
