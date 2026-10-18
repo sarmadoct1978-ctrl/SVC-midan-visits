@@ -5762,11 +5762,32 @@ function partPickerHtml(){
     </div>
     <div id="partPickHint" style="font-size:11.5px;color:var(--muted);margin-top:4px;"></div>`;
 }
-// model names are compared loosely: case, spaces, dashes and a leading brand name are ignored ("Oukitel C2" = "c2")
+// Brand and model names are compared loosely so Arabic and English spellings match:
+// "اوكيتيل" = "Oukitel", "٦٢" = "62", and case, spaces, dashes and a leading brand name are ignored.
+const BRAND_ALIASES = {
+  oukitel:['oukitel','اوكيتيل','أوكيتيل','اوكتيل','أوكتيل','اوكيتل','اوكيتال'],
+  doogee:['doogee','دوجي','دوكي','دووجي'],
+  samsung:['samsung','سامسونج','سامسونگ','سامسونك'],
+  xiaomi:['xiaomi','شاومي','شياومي','redmi','ريدمي'],
+  infinix:['infinix','انفنكس','انفينكس','إنفينكس'],
+  tecno:['tecno','تكنو','تيكنو'],
+  zte:['zte','زد تي اي'],
+  apple:['apple','iphone','ايفون','آيفون','ابل'],
+  huawei:['huawei','هواوي'], honor:['honor','هونر','هونور'], nokia:['nokia','نوكيا'], realme:['realme','ريلمي'], oppo:['oppo','اوبو'], vivo:['vivo','فيفو'],
+};
+function latinDigits(x){ return String(x||'').replace(/[٠-٩]/g, d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); }
+function normBrand(b){
+  const x = latinDigits(b).toLowerCase().trim().replace(/\s+/g,' ');
+  if(!x) return '';
+  for(const [k, list] of Object.entries(BRAND_ALIASES)) if(list.some(a=>x===a.toLowerCase())) return k;
+  return x;
+}
 function normModel(m, brand){
-  let x = String(m||'').toLowerCase().trim();
-  const b = String(brand||'').toLowerCase().trim();
-  if(b && x.startsWith(b)) x = x.slice(b.length);
+  let x = latinDigits(m).toLowerCase().trim().replace(/\s+/g,' ');
+  const key = normBrand(brand);
+  const names = (BRAND_ALIASES[key] || [String(brand||'').toLowerCase().trim()]).filter(Boolean).map(a=>a.toLowerCase()).sort((a,b)=>b.length-a.length);
+  for(const n of names){ if(x.startsWith(n)){ x = x.slice(n.length); break; } }
+  x = x.replace(/^سي\s*/, 'c').replace(/^نوت\s*/, 'note').replace(/برو/g,'pro').replace(/بلس/g,'plus');
   return x.replace(/[\s\-_.\/]+/g,'');
 }
 function partTypeOf(p){ return p.partType || inferPartType(p.name) || ''; }
@@ -5774,7 +5795,7 @@ function partTypeOf(p){ return p.partType || inferPartType(p.name) || ''; }
 function partFit(p, type, brand, model){
   if(p.defective) return '';
   if(type && partTypeOf(p)!==type) return '';
-  const b = String(brand||'').toLowerCase().trim(), pb = String(p.brand||'').toLowerCase().trim();
+  const b = normBrand(brand), pb = normBrand(p.brand);
   if(b && pb && pb!==b) return '';
   const m = normModel(model, brand), pm = normModel(p.model, p.brand||brand);
   if(m && pm && pm!==m) return '';
